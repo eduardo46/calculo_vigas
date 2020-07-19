@@ -40,7 +40,7 @@ class _VigaScreenState extends State<VigaScreen> {
       )) {
         case Pages.FIRST:
           setState(() {
-            onAddViga();
+            onAddViga(1);
           });
           break;
         case Pages.SECOND:
@@ -146,12 +146,13 @@ class _VigaScreenState extends State<VigaScreen> {
     });
   }
 
-  void onAddViga() {
+  void onAddViga(int kkk) {
     setState(() {
       var _viga = Viga();
       calculos.add(Vigaclass(
         viga: _viga,
         onDelete: () => onDelete(_viga),
+        kkk: kkk,
       ));
     });
   }
