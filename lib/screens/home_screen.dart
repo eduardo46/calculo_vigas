@@ -58,8 +58,6 @@ Widget _buildlistavigas() {
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.w600,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
                                   ),
                                 ),
                               ],

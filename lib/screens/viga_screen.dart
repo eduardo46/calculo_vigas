@@ -1,3 +1,5 @@
+import 'package:calculo_vigas/models/viga_generator.dart';
+import 'package:calculo_vigas/models/vigas/viga1.dart';
 import 'package:calculo_vigas/models/vigas_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,42 +15,32 @@ class VigaScreen extends StatefulWidget {
   _VigaScreenState createState() => _VigaScreenState();
 }
 
-enum Pages { FIRST, SECOND, THIRD }
-
-class _VigaScreenState extends State<VigaScreen> {
+class _VigaScreenState extends State<VigaScreen> with VigaGenerator {
   List<Vigaclass> calculos = [];
   @override
   Widget build(BuildContext context) {
-    Future _selectPage() async {
-      switch (await showDialog(
-        context: context,
-        child: SimpleDialog(
-          title: Text('Selecciona una Opcion'),
-          children: <Widget>[
-            SimpleDialogOption(
-                child: Text('First Page'),
-                onPressed: () {
-                  Navigator.pop(context, Pages.FIRST);
-                }),
-            SimpleDialogOption(
-                child: Text('Second Page'),
-                onPressed: () {
-                  Navigator.pop(context, Pages.SECOND);
-                }),
-          ],
-        ),
-      )) {
-        case Pages.FIRST:
-          setState(() {
-            onAddViga(1);
+    Future<Null> _showList() async {
+      int selected = await showDialog<int>(
+          context: context,
+          builder: (BuildContext context) {
+            return new SimpleDialog(
+              title: const Text('Selecciona una opcion'),
+              children: widget.vigasDatos.nombreCalculos.map((value) {
+                return new SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(
+                        context,
+                        widget.vigasDatos.nombreCalculos.indexOf(
+                            value)); //here passing the index to be return on item selection
+                  },
+                  child: new Text('Calcular $value'), //item value
+                );
+              }).toList(),
+            );
           });
-          break;
-        case Pages.SECOND:
-          setState(() {
-            onAddViga();
-          });
-          break;
-      }
+      setState(() {
+        if (selected != null) onAddViga(selected);
+      });
     }
 
     return Scaffold(
@@ -104,7 +96,7 @@ class _VigaScreenState extends State<VigaScreen> {
                     horizontal: 40.0,
                   ),
                   child: FlatButton(
-                    onPressed: () => _selectPage(),
+                    onPressed: () => _showList(),
                     padding: EdgeInsets.all(15.0),
                     color: Colors.blueGrey,
                     child: Text(
@@ -146,14 +138,12 @@ class _VigaScreenState extends State<VigaScreen> {
     });
   }
 
-  void onAddViga(int kkk) {
-    setState(() {
-      var _viga = Viga();
-      calculos.add(Vigaclass(
-        viga: _viga,
-        onDelete: () => onDelete(_viga),
-        kkk: kkk,
-      ));
-    });
+  void onAddViga(int index) {
+    var _viga = vigaret(1);
+    calculos.add(Vigaclass(
+      viga: _viga,
+      onDelete: () => onDelete(_viga),
+      index: index,
+    ));
   }
 }
