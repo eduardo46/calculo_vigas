@@ -76,10 +76,10 @@ Widget _buildlistavigas() {
                       left: 40.0,
                       top: 15.0,
                       bottom: 15.0,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: Hero(
-                          tag: 'diagrama',
+                      child: Hero(
+                        tag: datosvigas.imageURL,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20.0),
                           child: SvgPicture.asset(
                             datosvigas.imageURL,
                             width: 110,

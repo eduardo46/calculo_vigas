@@ -1,10 +1,8 @@
-import 'package:calculo_vigas/models/viga_generator.dart';
-import 'package:calculo_vigas/models/vigas/viga1.dart';
 import 'package:calculo_vigas/models/vigas_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'dart:async';
-import 'package:calculo_vigas/widgets/viga_widget.dart';
+import 'package:math_expressions/math_expressions.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VigaScreen extends StatefulWidget {
   final DatosVigas vigasDatos;
@@ -15,34 +13,34 @@ class VigaScreen extends StatefulWidget {
   _VigaScreenState createState() => _VigaScreenState();
 }
 
-class _VigaScreenState extends State<VigaScreen> with VigaGenerator {
-  List<Vigaclass> calculos = [];
+class _VigaScreenState extends State<VigaScreen> {
+  List<DropdownMenuItem<ListItem>> _dropdownMenuItems;
+  ListItem _selectedItem;
+  var variables = new Map();
+  Parser par = Parser();
+  String resultados = '';
+
+  void initState() {
+    super.initState();
+    _dropdownMenuItems = buildDropDownMenuItems(widget.vigasDatos.listCalculos);
+    _selectedItem = _dropdownMenuItems[0].value;
+  }
+
+  List<DropdownMenuItem<ListItem>> buildDropDownMenuItems(List listItems) {
+    List<DropdownMenuItem<ListItem>> items = List();
+    for (ListItem listItem in listItems) {
+      items.add(
+        DropdownMenuItem(
+          child: Text(listItem.nombre),
+          value: listItem,
+        ),
+      );
+    }
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<Null> _showList() async {
-      int selected = await showDialog<int>(
-          context: context,
-          builder: (BuildContext context) {
-            return new SimpleDialog(
-              title: const Text('Selecciona una opcion'),
-              children: widget.vigasDatos.nombreCalculos.map((value) {
-                return new SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.pop(
-                        context,
-                        widget.vigasDatos.nombreCalculos.indexOf(
-                            value)); //here passing the index to be return on item selection
-                  },
-                  child: new Text('Calcular $value'), //item value
-                );
-              }).toList(),
-            );
-          });
-      setState(() {
-        if (selected != null) onAddViga(selected);
-      });
-    }
-
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -69,7 +67,7 @@ class _VigaScreenState extends State<VigaScreen> with VigaGenerator {
                   ],
                 ),
                 child: Hero(
-                  tag: 'diagrama',
+                  tag: widget.vigasDatos.imageURL,
                   child: SvgPicture.asset(
                     widget.vigasDatos.imageURL,
                     fit: BoxFit.cover,
@@ -95,12 +93,57 @@ class _VigaScreenState extends State<VigaScreen> with VigaGenerator {
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
                   ),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                        border: Border.all()),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<ListItem>(
+                          hint: Text("Seleccionar Calculo"),
+                          value: _selectedItem,
+                          items: _dropdownMenuItems,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedItem = value;
+                              print(_selectedItem.nombre);
+                            });
+                          }),
+                    ),
+                  ),
+                ),
+                ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(8),
+                    itemCount: widget.vigasDatos.nomvar.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                          padding: EdgeInsets.only(bottom: 10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.white),
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            onChanged: (v) =>
+                                variables[widget.vigasDatos.nomvar[index]] =
+                                    double.parse(v),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText:
+                                  'Valor de ' + widget.vigasDatos.nomvar[index],
+                            ),
+                          ));
+                    }),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                   child: FlatButton(
-                    onPressed: () => _showList(),
+                    onPressed: () => calcular(),
                     padding: EdgeInsets.all(15.0),
-                    color: Colors.blueGrey,
+                    color: Colors.blue,
                     child: Text(
-                      'Agregar Calculo',
+                      'Calcular',
                       style: TextStyle(
                         color: Colors.white,
                         letterSpacing: 2.5,
@@ -111,15 +154,23 @@ class _VigaScreenState extends State<VigaScreen> with VigaGenerator {
                     ),
                   ),
                 ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(8),
-                  itemCount: calculos.length,
-                  itemBuilder: (_, int index) => calculos[index],
-                  separatorBuilder: (BuildContext context, int index) =>
-                      const Divider(),
-                )
+                Container(
+                  width: 100,
+                  height: 200,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Text(
+                      resultados,
+                      style: GoogleFonts.nanumMyeongjo(fontSize: 20),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
@@ -128,22 +179,20 @@ class _VigaScreenState extends State<VigaScreen> with VigaGenerator {
     );
   }
 
-  void onDelete(Viga _viga) {
+  void calcular() {
     setState(() {
-      var find = calculos.firstWhere(
-        (it) => it.viga == _viga,
-        orElse: () => null,
-      );
-      if (find != null) calculos.removeAt(calculos.indexOf(find));
+      resultados += _selectedItem.nombre +
+          ' = ' +
+          _selectedItem.formula.replaceAll(new RegExp('\\*'), '×') +
+          "\n";
+      Expression exp = par.parse(_selectedItem.formula);
+      ContextModel cm = ContextModel();
+      for (var i = 0; i < widget.vigasDatos.nomvar.length; i++) {
+        Variable v = Variable(widget.vigasDatos.nomvar[i]);
+        cm.bindVariable(v, Number(variables[widget.vigasDatos.nomvar[i]]));
+      }
+      double eval = exp.evaluate(EvaluationType.REAL, cm);
+      resultados += _selectedItem.nombre + ' = ' + eval.toString() + "\n\n";
     });
-  }
-
-  void onAddViga(int index) {
-    var _viga = vigaret(1);
-    calculos.add(Vigaclass(
-      viga: _viga,
-      onDelete: () => onDelete(_viga),
-      index: index,
-    ));
   }
 }
