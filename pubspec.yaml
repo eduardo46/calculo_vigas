@@ -23,9 +23,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_svg: ^0.18.0
+  sqflite:   
+  flutter_svg: ^0.19.3
   math_expressions: ^2.0.0
   google_fonts: ^1.1.0
+  intl: ^0.16.0
 
 
   # The following adds the Cupertino Icons font to your application.

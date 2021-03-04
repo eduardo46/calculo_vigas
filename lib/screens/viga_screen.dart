@@ -1,13 +1,17 @@
 import 'package:calculo_vigas/models/vigas_model.dart';
+import 'package:calculo_vigas/models/database_saved_vigas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class VigaScreen extends StatefulWidget {
   final DatosVigas vigasDatos;
+  final int indice;
+  final String resultado;
 
-  VigaScreen({this.vigasDatos});
+  VigaScreen({this.vigasDatos, this.indice, this.resultado});
 
   @override
   _VigaScreenState createState() => _VigaScreenState();
@@ -19,11 +23,14 @@ class _VigaScreenState extends State<VigaScreen> {
   var variables = new Map();
   Parser par = Parser();
   String resultados = '';
+  var saved = false;
+  Icon _fav = Icon(Icons.favorite_border);
 
   void initState() {
     super.initState();
     _dropdownMenuItems = buildDropDownMenuItems(widget.vigasDatos.listCalculos);
     _selectedItem = _dropdownMenuItems[0].value;
+    resultados = widget.resultado;
   }
 
   List<DropdownMenuItem<ListItem>> buildDropDownMenuItems(List listItems) {
@@ -37,6 +44,27 @@ class _VigaScreenState extends State<VigaScreen> {
       );
     }
     return items;
+  }
+
+  _read() async {
+    DatabaseHelper helper = DatabaseHelper.instance;
+    int rowId = 1;
+    Viga vigadb = await helper.queryViga(rowId);
+    if (vigadb == null) {
+      print('read row $rowId: empty');
+    } else {
+      print('read row $rowId: ${vigadb.resultados} ${vigadb.fecha}');
+    }
+  }
+
+  _save() async {
+    Viga vigadb = Viga();
+    vigadb.resultados = resultados;
+    vigadb.fecha = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    vigadb.indice = widget.indice;
+    DatabaseHelper helper = DatabaseHelper.instance;
+    int id = await helper.insert(vigadb);
+    print('inserted row: $id');
   }
 
   @override
@@ -77,9 +105,24 @@ class _VigaScreenState extends State<VigaScreen> {
             expandedHeight: MediaQuery.of(context).size.width + 100,
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.favorite_border),
+                icon: _fav,
                 tooltip: 'Guardar',
-                onPressed: () {/* ... */},
+                onPressed: () {
+                  setState(() {
+                    if (!saved) {
+                      _fav = Icon(Icons.favorite, color: Colors.red);
+                      saved = true;
+                      _save();
+                      _read();
+                      print('guardado');
+                    } else {
+                      //ver caso de cancelar guardado
+                      _fav = Icon(Icons.favorite_border);
+                      saved = false;
+                      print("desguardado");
+                    }
+                  });
+                },
               ),
             ],
           ),
@@ -179,6 +222,7 @@ class _VigaScreenState extends State<VigaScreen> {
     );
   }
 
+  //****Revisar caso de no ingresar un campo necesitado y mande null****
   void calcular() {
     setState(() {
       resultados += _selectedItem.nombre +
