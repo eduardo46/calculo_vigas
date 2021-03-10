@@ -44,7 +44,7 @@ List<DatosVigas> datosvigass = [
       subtitulo: 'Con Carga Aumentando Uniformente Hacia un Extremo',
       imageURL: 'assets/images/DIAGRAMA2.svg',
       listCalculos: [
-        ListItem('C', '(16*W)/(9*√3)'), //checkar
+        ListItem('C', '(16*W)/(9*sqrt(3))'), //checkar
         ListItem('R₁ = V₁', 'W/3'),
         ListItem('R₂ = V₂ max', '(2*W)/3'),
         ListItem('Vx', '(W/3)- ((W*x^2)/l^2)'),

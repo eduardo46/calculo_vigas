@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:calculo_vigas/models/vigas_model.dart';
 import 'package:calculo_vigas/models/database_saved_vigas.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,9 @@ import 'package:intl/intl.dart';
 class VigaScreen extends StatefulWidget {
   final DatosVigas vigasDatos;
   final int indice;
-  final String resultado;
+  final Map dbData;
 
-  VigaScreen({this.vigasDatos, this.indice, this.resultado});
+  VigaScreen({this.vigasDatos, this.indice, this.dbData});
 
   @override
   _VigaScreenState createState() => _VigaScreenState();
@@ -20,9 +21,10 @@ class VigaScreen extends StatefulWidget {
 class _VigaScreenState extends State<VigaScreen> {
   List<DropdownMenuItem<ListItem>> _dropdownMenuItems;
   ListItem _selectedItem;
-  var variables = new Map();
+  Map variables = new Map();
   Parser par = Parser();
   String resultados = '';
+  int _id = 0;
   var saved = false;
   Icon _fav = Icon(Icons.favorite_border);
 
@@ -30,11 +32,17 @@ class _VigaScreenState extends State<VigaScreen> {
     super.initState();
     _dropdownMenuItems = buildDropDownMenuItems(widget.vigasDatos.listCalculos);
     _selectedItem = _dropdownMenuItems[0].value;
-    resultados = widget.resultado;
+    if (widget.dbData != null) {
+      resultados = widget.dbData['resultados'];
+      variables = jsonDecode(widget.dbData['variables']);
+      saved = true;
+      _id = widget.dbData['_id'];
+      _fav = Icon(Icons.favorite, color: Colors.red);
+    }
   }
 
   List<DropdownMenuItem<ListItem>> buildDropDownMenuItems(List listItems) {
-    List<DropdownMenuItem<ListItem>> items = List();
+    List<DropdownMenuItem<ListItem>> items = [];
     for (ListItem listItem in listItems) {
       items.add(
         DropdownMenuItem(
@@ -44,27 +52,6 @@ class _VigaScreenState extends State<VigaScreen> {
       );
     }
     return items;
-  }
-
-  _read() async {
-    DatabaseHelper helper = DatabaseHelper.instance;
-    int rowId = 1;
-    Viga vigadb = await helper.queryViga(rowId);
-    if (vigadb == null) {
-      print('read row $rowId: empty');
-    } else {
-      print('read row $rowId: ${vigadb.resultados} ${vigadb.fecha}');
-    }
-  }
-
-  _save() async {
-    Viga vigadb = Viga();
-    vigadb.resultados = resultados;
-    vigadb.fecha = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    vigadb.indice = widget.indice;
-    DatabaseHelper helper = DatabaseHelper.instance;
-    int id = await helper.insert(vigadb);
-    print('inserted row: $id');
   }
 
   @override
@@ -95,7 +82,9 @@ class _VigaScreenState extends State<VigaScreen> {
                   ],
                 ),
                 child: Hero(
-                  tag: widget.vigasDatos.imageURL,
+                  tag: widget.dbData == null
+                      ? widget.vigasDatos.imageURL
+                      : widget.dbData['_id'],
                   child: SvgPicture.asset(
                     widget.vigasDatos.imageURL,
                     fit: BoxFit.cover,
@@ -110,13 +99,12 @@ class _VigaScreenState extends State<VigaScreen> {
                 onPressed: () {
                   setState(() {
                     if (!saved) {
+                      _savedb();
                       _fav = Icon(Icons.favorite, color: Colors.red);
                       saved = true;
-                      _save();
-                      _read();
                       print('guardado');
                     } else {
-                      //ver caso de cancelar guardado
+                      _deletedb();
                       _fav = Icon(Icons.favorite_border);
                       saved = false;
                       print("desguardado");
@@ -167,7 +155,13 @@ class _VigaScreenState extends State<VigaScreen> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
                               color: Colors.white),
-                          child: TextField(
+                          child: TextFormField(
+                            initialValue:
+                                variables[widget.vigasDatos.nomvar[index]] ==
+                                        null
+                                    ? ''
+                                    : variables[widget.vigasDatos.nomvar[index]]
+                                        .toString(),
                             keyboardType: TextInputType.number,
                             onChanged: (v) =>
                                 variables[widget.vigasDatos.nomvar[index]] =
@@ -182,7 +176,7 @@ class _VigaScreenState extends State<VigaScreen> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                   child: FlatButton(
-                    onPressed: () => calcular(),
+                    onPressed: () => _calcular(),
                     padding: EdgeInsets.all(15.0),
                     color: Colors.blue,
                     child: Text(
@@ -223,7 +217,7 @@ class _VigaScreenState extends State<VigaScreen> {
   }
 
   //****Revisar caso de no ingresar un campo necesitado y mande null****
-  void calcular() {
+  _calcular() {
     setState(() {
       resultados += _selectedItem.nombre +
           ' = ' +
@@ -238,5 +232,22 @@ class _VigaScreenState extends State<VigaScreen> {
       double eval = exp.evaluate(EvaluationType.REAL, cm);
       resultados += _selectedItem.nombre + ' = ' + eval.toString() + "\n\n";
     });
+  }
+
+  _savedb() async {
+    Viga vigadb = Viga();
+    vigadb.resultados = resultados;
+    vigadb.fecha = DateFormat('dd-MM-yyyy').add_jm().format(DateTime.now());
+    vigadb.indice = widget.indice;
+    vigadb.variables = jsonEncode(variables);
+    DatabaseHelper helper = DatabaseHelper.instance;
+    _id = await helper.insert(vigadb);
+    print('inserted row: $_id');
+  }
+
+  _deletedb() async {
+    DatabaseHelper helper = DatabaseHelper.instance;
+    _id = await helper.delete(_id);
+    print('deleted row: $_id');
   }
 }

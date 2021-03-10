@@ -30,8 +30,7 @@ class ListaVigasGuardadas extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (_) => VigaScreen(
                                       vigasDatos: datosvigas,
-                                      resultado: snapshot.data[index]
-                                          ['resultados'],
+                                      dbData: snapshot.data[index],
                                     ))),
                         child: Stack(
                           children: <Widget>[
@@ -90,7 +89,7 @@ class ListaVigasGuardadas extends StatelessWidget {
                               top: 15.0,
                               bottom: 15.0,
                               child: Hero(
-                                tag: datosvigas.imageURL,
+                                tag: snapshot.data[index]['_id'],
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(20.0),
                                   child: SvgPicture.asset(

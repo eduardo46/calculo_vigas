@@ -9,6 +9,7 @@ final String columnId = '_id';
 final String columnResultados = 'resultados';
 final String columnFecha = 'fecha';
 final String columnIndice = 'indice';
+final String columnvariables = 'variables';
 
 // data model class
 class Viga {
@@ -16,6 +17,7 @@ class Viga {
   String resultados;
   String fecha;
   int indice;
+  String variables;
 
   Viga();
 
@@ -25,6 +27,7 @@ class Viga {
     resultados = map[columnResultados];
     fecha = map[columnFecha];
     indice = map[columnIndice];
+    variables = map[columnvariables];
   }
 
   // convenience method to create a Map from this Word object
@@ -32,7 +35,8 @@ class Viga {
     var map = <String, dynamic>{
       columnResultados: resultados,
       columnFecha: fecha,
-      columnIndice: indice
+      columnIndice: indice,
+      columnvariables: variables
     };
     if (id != null) {
       map[columnId] = id;
@@ -76,16 +80,22 @@ class DatabaseHelper {
                 $columnId INTEGER PRIMARY KEY,
                 $columnResultados TEXT NOT NULL,
                 $columnFecha TEXT NOT NULL,
-                $columnIndice INTEGER NOT NULL
+                $columnIndice INTEGER NOT NULL,
+                $columnvariables TEXT NOT NULL
               )
               ''');
   }
 
   // Database helper methods:
-
   Future<int> insert(Viga viga) async {
     Database db = await database;
     int id = await db.insert(tableVigas, viga.toMap());
+    return id;
+  }
+
+  Future<int> delete(int id) async {
+    Database db = await database;
+    db.delete(tableVigas, where: '$columnId = ?', whereArgs: [id]);
     return id;
   }
 

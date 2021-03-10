@@ -23,7 +23,6 @@ class ListaVigas extends StatelessWidget {
                           builder: (_) => VigaScreen(
                                 vigasDatos: datosvigas,
                                 indice: index,
-                                resultado: '',
                               ))),
                   child: Stack(
                     children: <Widget>[
