@@ -22,7 +22,7 @@ List<DatosVigas> datosvigass = [
   DatosVigas(
       tiulo: 'Viga Simple',
       subtitulo: 'Con Carga Uniformente Distribuida',
-      imageURL: 'assets/images/DIAGRAMA.svg',
+      imageURL: 'assets/vigas/DIAGRAMA.svg',
       listCalculos: [
         ListItem('C', 'w*l'),
         ListItem('R', '(w*l)/2'),
@@ -42,7 +42,7 @@ List<DatosVigas> datosvigass = [
   DatosVigas(
       tiulo: 'Viga Simple',
       subtitulo: 'Con Carga Aumentando Uniformente Hacia un Extremo',
-      imageURL: 'assets/images/DIAGRAMA2.svg',
+      imageURL: 'assets/vigas/DIAGRAMA2.svg',
       listCalculos: [
         ListItem('C', '(16*W)/(9*sqrt(3))'), //checkar
         ListItem('R₁ = V₁', 'W/3'),
@@ -63,7 +63,7 @@ List<DatosVigas> datosvigass = [
   DatosVigas(
       tiulo: 'Viga Simple',
       subtitulo: 'Con Carga Aumentando Uniformente Hacia un Centro',
-      imageURL: 'assets/images/DIAGRAMA3.svg',
+      imageURL: 'assets/vigas/DIAGRAMA3.svg',
       listCalculos: [
         ListItem('C', '(4*W)/3'),
         ListItem('R₁ = V₁', 'W/3'),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:calculo_vigas/widgets/nomenclatura_w.dart';
 import 'package:calculo_vigas/widgets/lista_vigas.dart';
 import 'package:calculo_vigas/widgets/lista_saved_vigas.dart';
+import 'package:calculo_vigas/widgets/user_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ListaVigas(),
     NomenclaturaWidget(),
     ListaVigasGuardadas(),
-    PlaceholderWidget(Colors.brown)
+    UsuarioActual()
   ];
   Widget build(BuildContext context) {
     return Scaffold(

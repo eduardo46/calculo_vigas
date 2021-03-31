@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "836605062045",
+    "project_id": "calculo-de-vigas-fc1e6",
+    "storage_bucket": "calculo-de-vigas-fc1e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836605062045:android:8f79ff7989778095cb5d74",
+        "android_client_info": {
+          "package_name": "com.labsol.calculo_vigas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "836605062045-fuddvmm03ktbh8j1k6t2q11ai06m75oa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhLiX1IpJ8gTK1wLfWZtTvJWkz9UOdnGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "836605062045-fuddvmm03ktbh8j1k6t2q11ai06m75oa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

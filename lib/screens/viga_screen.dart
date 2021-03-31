@@ -175,17 +175,19 @@ class _VigaScreenState extends State<VigaScreen> {
                     }),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                  child: FlatButton(
+                  child: ElevatedButton(
                     onPressed: () => _calcular(),
-                    padding: EdgeInsets.all(15.0),
-                    color: Colors.blue,
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.blue,
+                        onPrimary: Colors.white,
+                        padding: EdgeInsets.all(15.0)),
                     child: Text(
                       'Calcular',
                       style: TextStyle(
                         color: Colors.white,
-                        letterSpacing: 2.5,
+                        letterSpacing: 2,
                         fontSize: 20.0,
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.bold,
                         fontFamily: 'OpenSans',
                       ),
                     ),
