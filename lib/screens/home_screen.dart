@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:calculo_vigas/widgets/nomenclatura_w.dart';
 import 'package:calculo_vigas/widgets/lista_vigas.dart';
 import 'package:calculo_vigas/widgets/lista_saved_vigas.dart';
-import 'package:calculo_vigas/widgets/user_bar.dart';
+import 'package:calculo_vigas/screens/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ListaVigas(),
     NomenclaturaWidget(),
     ListaVigasGuardadas(),
-    UsuarioActual()
+    LoginScreen()
   ];
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,19 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
       ),
-    );
-  }
-}
-
-class PlaceholderWidget extends StatelessWidget {
-  final Color color;
-
-  PlaceholderWidget(this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: color,
     );
   }
 }

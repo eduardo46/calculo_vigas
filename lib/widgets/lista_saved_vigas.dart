@@ -2,7 +2,7 @@ import 'package:calculo_vigas/screens/viga_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:calculo_vigas/models/vigas_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:calculo_vigas/models/database_saved_vigas.dart';
+import 'package:calculo_vigas/services/database_saved_vigas.dart';
 
 DatabaseHelper helper = DatabaseHelper.instance;
 

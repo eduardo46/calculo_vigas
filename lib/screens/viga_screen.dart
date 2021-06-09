@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:calculo_vigas/models/vigas_model.dart';
-import 'package:calculo_vigas/models/database_saved_vigas.dart';
+import 'package:calculo_vigas/services/database_saved_vigas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:math_expressions/math_expressions.dart';
